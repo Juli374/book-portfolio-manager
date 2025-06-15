@@ -35,10 +35,16 @@ const BookPortfolioManager = () => {
     sales: ''
   });
 
-  // Инициализация с примерами данных
+  // Инициализация с данными из localStorage или примерами
   useEffect(() => {
-    // Добавляем несколько примеров книг при первой загрузке
-    if (books.length === 0) {
+    // Загружаем данные из localStorage
+    const savedBooks = localStorage.getItem('amazonBooks');
+    
+    if (savedBooks) {
+      // Если есть сохраненные данные, загружаем их
+      setBooks(JSON.parse(savedBooks));
+    } else {
+      // Если нет сохраненных данных, добавляем примеры
       const sampleBooks = [
         {
           id: 'sample1_us',
@@ -66,8 +72,17 @@ const BookPortfolioManager = () => {
         }
       ];
       setBooks(sampleBooks);
+      // Сохраняем примеры в localStorage
+      localStorage.setItem('amazonBooks', JSON.stringify(sampleBooks));
     }
   }, []);
+
+  // Сохраняем в localStorage при каждом изменении книг
+  useEffect(() => {
+    if (books.length > 0) {
+      localStorage.setItem('amazonBooks', JSON.stringify(books));
+    }
+  }, [books]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -333,13 +348,13 @@ const BookPortfolioManager = () => {
         {/* Галерея книг */}
         <div className="flex flex-wrap gap-4 justify-start">
           {filteredBooks.map(book => (
-            <div key={book.id} className="bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow w-48">
-              <div className="h-64 bg-gray-100 flex items-center justify-center">
+            <div key={book.id} className="bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow w-56">
+              <div className="h-80 bg-gray-100 flex items-center justify-center p-2">
                 {book.coverImage ? (
                   <img 
                     src={book.coverImage} 
                     alt={book.title}
-                    className="h-full w-full object-cover"
+                    className="max-h-full max-w-full object-contain rounded"
                   />
                 ) : (
                   <div className="text-gray-400 text-center">
@@ -349,7 +364,7 @@ const BookPortfolioManager = () => {
                 )}
               </div>
               
-              <div className="p-3">
+              <div className="p-4">
                 <h3 className="font-semibold text-gray-800 text-sm mb-2 line-clamp-2" title={book.title}>
                   {book.title}
                 </h3>
@@ -364,36 +379,43 @@ const BookPortfolioManager = () => {
                 )}
                 
                 {book.price && (
-                  <div className="text-xs mb-3">
-                    <span className="font-semibold text-green-600">${book.price}</span>
+                  <div className="text-sm mb-3">
+                    <span className="font-bold text-green-600">${book.price}</span>
                   </div>
                 )}
                 
-                <div className="flex gap-1">
-                  {book.amazonLink && (
+                {/* Кнопка Amazon отдельно */}
+                {book.amazonLink && (
+                  <div className="mb-3">
                     <a
                       href={book.amazonLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 bg-orange-500 hover:bg-orange-600 text-white text-center py-1 px-2 rounded text-xs flex items-center justify-center gap-1 transition-colors"
+                      className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
                     >
-                      <ExternalLink size={12} />
-                      Amazon
+                      <ExternalLink size={16} />
+                      Купить на Amazon
                     </a>
-                  )}
+                  </div>
+                )}
+                
+                {/* Кнопки управления */}
+                <div className="flex gap-2">
                   <button
                     onClick={() => editBook(book)}
-                    className="bg-blue-500 hover:bg-blue-600 text-white p-1 rounded transition-colors"
+                    className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded text-xs transition-colors flex items-center justify-center gap-1"
                     title="Редактировать"
                   >
                     <Edit size={12} />
+                    Изменить
                   </button>
                   <button
                     onClick={() => deleteBookGroup(book.baseId)}
-                    className="bg-red-500 hover:bg-red-600 text-white p-1 rounded transition-colors"
+                    className="flex-1 bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded text-xs transition-colors flex items-center justify-center gap-1"
                     title="Удалить со всех рынков"
                   >
                     <Trash2 size={12} />
+                    Удалить
                   </button>
                 </div>
               </div>
