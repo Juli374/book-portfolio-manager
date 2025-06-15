@@ -520,18 +520,14 @@ const BookPortfolioManager = () => {
                   </p>
                 )}
                 
-                {/* Тип книги и рынки */}
-                <div className="mb-2">
-                  {book.bookType === 'english' ? (
+                {/* Тип книги и рынки - показываем только для английских книг */}
+                {book.bookType === 'english' && (
+                  <div className="mb-2">
                     <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                       🌍 США + UK + AU + CA
                     </span>
-                  ) : (
-                    <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      🇩🇪 Только Германия
-                    </span>
-                  )}
-                </div>
+                  </div>
+                )}
                 
                 {/* Аккаунт */}
                 <div className="mb-2">
