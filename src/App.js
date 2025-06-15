@@ -24,8 +24,10 @@ const BookPortfolioManager = () => {
     bookType: 'english', // 'english' или 'german'
     price: '',
     amazonLink: '',
+    websiteLink: '',
     portfolioName: '',
-    coverImage: ''
+    coverImage: '',
+    status: 'active' // 'active' или 'archive'
   });
 
   const [calculatorData, setCalculatorData] = useState({
@@ -54,8 +56,10 @@ const BookPortfolioManager = () => {
           market: 'us',
           price: '12.99',
           amazonLink: 'https://amazon.com/dp/example1',
+          websiteLink: '',
           portfolioName: 'Business Books',
           coverImage: '',
+          status: 'active',
           createdAt: new Date().toISOString()
         },
         {
@@ -66,8 +70,10 @@ const BookPortfolioManager = () => {
           market: 'uk',
           price: '9.99',
           amazonLink: 'https://amazon.co.uk/dp/example1',
+          websiteLink: '',
           portfolioName: 'Business Books',
           coverImage: '',
+          status: 'active',
           createdAt: new Date().toISOString()
         }
       ];
@@ -112,8 +118,10 @@ const BookPortfolioManager = () => {
           market: market,
           price: formData.price,
           amazonLink: formData.amazonLink,
+          websiteLink: formData.websiteLink,
           portfolioName: formData.portfolioName,
           coverImage: formData.coverImage,
+          status: formData.status || 'active',
           createdAt: new Date().toISOString()
         });
       });
@@ -127,8 +135,10 @@ const BookPortfolioManager = () => {
         market: 'de',
         price: formData.price,
         amazonLink: formData.amazonLink,
+        websiteLink: formData.websiteLink,
         portfolioName: formData.portfolioName,
         coverImage: formData.coverImage,
+        status: formData.status || 'active',
         createdAt: new Date().toISOString()
       });
     }
@@ -150,39 +160,14 @@ const BookPortfolioManager = () => {
     localStorage.setItem('amazonBooks', JSON.stringify(updatedBooks));
   };
 
-  const clearAllData = () => {
-    if (window.confirm('Вы уверены, что хотите удалить ВСЕ книги? Это действие нельзя отменить!')) {
-      setBooks([]);
-      localStorage.removeItem('amazonBooks');
-    }
-  };
-
-  const exportData = () => {
-    const dataStr = JSON.stringify(books, null, 2);
-    const dataBlob = new Blob([dataStr], {type: 'application/json'});
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'amazon-books-backup.json';
-    link.click();
-  };
-
-  const importData = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const importedBooks = JSON.parse(e.target.result);
-          setBooks(importedBooks);
-          localStorage.setItem('amazonBooks', JSON.stringify(importedBooks));
-          alert('Данные успешно импортированы!');
-        } catch (error) {
-          alert('Ошибка при импорте файла!');
-        }
-      };
-      reader.readAsText(file);
-    }
+  const toggleBookStatus = (bookId) => {
+    const updatedBooks = books.map(book => 
+      book.id === bookId 
+        ? { ...book, status: book.status === 'active' ? 'archive' : 'active' }
+        : book
+    );
+    setBooks(updatedBooks);
+    localStorage.setItem('amazonBooks', JSON.stringify(updatedBooks));
   };
 
   const resetForm = () => {
@@ -192,8 +177,10 @@ const BookPortfolioManager = () => {
       bookType: 'english',
       price: '',
       amazonLink: '',
+      websiteLink: '',
       portfolioName: '',
-      coverImage: ''
+      coverImage: '',
+      status: 'active'
     });
     setShowAddForm(false);
     setEditingBook(null);
@@ -205,8 +192,10 @@ const BookPortfolioManager = () => {
       author: book.author,
       price: book.price,
       amazonLink: book.amazonLink,
+      websiteLink: book.websiteLink || '',
       portfolioName: book.portfolioName,
-      coverImage: book.coverImage
+      coverImage: book.coverImage,
+      status: book.status || 'active'
     });
     setEditingBook(book);
     setShowAddForm(true);
@@ -256,30 +245,6 @@ const BookPortfolioManager = () => {
           >
             <Plus size={20} />
             Добавить книгу
-          </button>
-          
-          <button
-            onClick={exportData}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
-          >
-            📥 Экспорт данных
-          </button>
-          
-          <label className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg cursor-pointer transition-colors">
-            📤 Импорт данных
-            <input
-              type="file"
-              accept=".json"
-              onChange={importData}
-              className="hidden"
-            />
-          </label>
-          
-          <button
-            onClick={clearAllData}
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
-          >
-            🗑️ Очистить все
           </button>
         </div>
 
@@ -349,15 +314,33 @@ const BookPortfolioManager = () => {
                 onChange={(e) => setFormData({...formData, portfolioName: e.target.value})}
                 className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
               />
+              
+              <div className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                <select
+                  value={formData.status}
+                  onChange={(e) => setFormData({...formData, status: e.target.value})}
+                  className="w-full bg-transparent outline-none"
+                >
+                  <option value="active">Активно</option>
+                  <option value="archive">Архив</option>
+                </select>
+              </div>
             </div>
             
-            <div className="mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <input
                 type="url"
                 placeholder="Ссылка на Amazon"
                 value={formData.amazonLink}
                 onChange={(e) => setFormData({...formData, amazonLink: e.target.value})}
-                className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 w-full"
+                className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="url"
+                placeholder="Ссылка на сайт книги"
+                value={formData.websiteLink}
+                onChange={(e) => setFormData({...formData, websiteLink: e.target.value})}
+                className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
               />
             </div>
             
@@ -445,38 +428,64 @@ const BookPortfolioManager = () => {
                   </div>
                 )}
                 
-                {/* Кнопка Amazon отдельно */}
-                {book.amazonLink && (
-                  <div className="mb-3">
+                {/* Статус книги */}
+                <div className="mb-3">
+                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                    book.status === 'active' 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {book.status === 'active' ? 'Активно' : 'Архив'}
+                  </span>
+                </div>
+                
+                {/* Кнопки ссылок */}
+                <div className="mb-3 space-y-2">
+                  {book.amazonLink && (
                     <a
                       href={book.amazonLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                      className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors text-sm"
                     >
                       <ExternalLink size={16} />
-                      Купить на Amazon
+                      Посмотреть на Amazon
                     </a>
-                  </div>
-                )}
+                  )}
+                  
+                  {book.websiteLink && (
+                    <a
+                      href={book.websiteLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors text-sm"
+                    >
+                      <ExternalLink size={16} />
+                      Перейти на сайт
+                    </a>
+                  )}
+                </div>
                 
                 {/* Кнопки управления */}
                 <div className="flex gap-2">
                   <button
                     onClick={() => editBook(book)}
-                    className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded text-xs transition-colors flex items-center justify-center gap-1"
+                    className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded text-xs transition-colors flex items-center justify-center gap-1"
                     title="Редактировать"
                   >
                     <Edit size={12} />
                     Изменить
                   </button>
                   <button
-                    onClick={() => deleteBookGroup(book.baseId)}
-                    className="flex-1 bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded text-xs transition-colors flex items-center justify-center gap-1"
-                    title="Удалить со всех рынков"
+                    onClick={() => toggleBookStatus(book.id)}
+                    className={`flex-1 py-2 px-3 rounded text-xs transition-colors flex items-center justify-center gap-1 ${
+                      book.status === 'active'
+                        ? 'bg-gray-500 hover:bg-gray-600 text-white'
+                        : 'bg-green-500 hover:bg-green-600 text-white'
+                    }`}
+                    title={book.status === 'active' ? 'В архив' : 'Активировать'}
                   >
-                    <Trash2 size={12} />
-                    Удалить
+                    {book.status === 'active' ? '📁 Архив' : '✅ Активно'}
                   </button>
                 </div>
               </div>
