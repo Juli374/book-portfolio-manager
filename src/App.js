@@ -145,7 +145,44 @@ const BookPortfolioManager = () => {
   };
 
   const deleteBookGroup = (baseId) => {
-    setBooks(books.filter(book => book.baseId !== baseId));
+    const updatedBooks = books.filter(book => book.baseId !== baseId);
+    setBooks(updatedBooks);
+    localStorage.setItem('amazonBooks', JSON.stringify(updatedBooks));
+  };
+
+  const clearAllData = () => {
+    if (window.confirm('Вы уверены, что хотите удалить ВСЕ книги? Это действие нельзя отменить!')) {
+      setBooks([]);
+      localStorage.removeItem('amazonBooks');
+    }
+  };
+
+  const exportData = () => {
+    const dataStr = JSON.stringify(books, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'amazon-books-backup.json';
+    link.click();
+  };
+
+  const importData = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const importedBooks = JSON.parse(e.target.result);
+          setBooks(importedBooks);
+          localStorage.setItem('amazonBooks', JSON.stringify(importedBooks));
+          alert('Данные успешно импортированы!');
+        } catch (error) {
+          alert('Ошибка при импорте файла!');
+        }
+      };
+      reader.readAsText(file);
+    }
   };
 
   const resetForm = () => {
@@ -219,6 +256,30 @@ const BookPortfolioManager = () => {
           >
             <Plus size={20} />
             Добавить книгу
+          </button>
+          
+          <button
+            onClick={exportData}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            📥 Экспорт данных
+          </button>
+          
+          <label className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg cursor-pointer transition-colors">
+            📤 Импорт данных
+            <input
+              type="file"
+              accept=".json"
+              onChange={importData}
+              className="hidden"
+            />
+          </label>
+          
+          <button
+            onClick={clearAllData}
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            🗑️ Очистить все
           </button>
         </div>
 
