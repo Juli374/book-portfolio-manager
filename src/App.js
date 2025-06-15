@@ -440,17 +440,29 @@ const BookPortfolioManager = () => {
                 </div>
                 
                 {/* Кнопки ссылок */}
-                <div className="mb-3 space-y-2">
-                  {/* Отладочная информация - потом удалить */}
-                  {console.log('Amazon Link:', book.amazonLink)}
-                  {console.log('Website Link:', book.websiteLink)}
-                  
+                <div className="mb-3" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {book.amazonLink && book.amazonLink.trim() !== '' && (
                     <a
                       href={book.amazonLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors text-sm block"
+                      style={{
+                        width: '100%',
+                        backgroundColor: '#f97316',
+                        color: 'white',
+                        fontWeight: '600',
+                        padding: '8px 16px',
+                        borderRadius: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        textDecoration: 'none',
+                        fontSize: '14px',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseEnter={(e) => e.target.style.backgroundColor = '#ea580c'}
+                      onMouseLeave={(e) => e.target.style.backgroundColor = '#f97316'}
                     >
                       <ExternalLink size={16} />
                       Посмотреть на Amazon
@@ -462,7 +474,23 @@ const BookPortfolioManager = () => {
                       href={book.websiteLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors text-sm block"
+                      style={{
+                        width: '100%',
+                        backgroundColor: '#8b5cf6',
+                        color: 'white',
+                        fontWeight: '600',
+                        padding: '8px 16px',
+                        borderRadius: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        textDecoration: 'none',
+                        fontSize: '14px',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseEnter={(e) => e.target.style.backgroundColor = '#7c3aed'}
+                      onMouseLeave={(e) => e.target.style.backgroundColor = '#8b5cf6'}
                     >
                       <ExternalLink size={16} />
                       Перейти на сайт
@@ -471,7 +499,19 @@ const BookPortfolioManager = () => {
                   
                   {/* Если нет ссылок - показываем заглушку */}
                   {(!book.amazonLink || book.amazonLink.trim() === '') && (!book.websiteLink || book.websiteLink.trim() === '') && (
-                    <div className="w-full bg-gray-300 text-gray-600 font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 text-sm">
+                    <div style={{
+                      width: '100%',
+                      backgroundColor: '#d1d5db',
+                      color: '#6b7280',
+                      fontWeight: '600',
+                      padding: '8px 16px',
+                      borderRadius: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      fontSize: '14px'
+                    }}>
                       Нет ссылок
                     </div>
                   )}
