@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, ExternalLink, Upload } from 'lucide-react';
+import { Plus, Edit, ExternalLink, Upload } from 'lucide-react';
 
 const BookPortfolioManager = () => {
   const [books, setBooks] = useState([]);
   const [selectedMarket, setSelectedMarket] = useState('us');
   const [showAddForm, setShowAddForm] = useState(false);
-  const [showCalculator, setShowCalculator] = useState(false);
   const [editingBook, setEditingBook] = useState(null);
 
   const markets = [
@@ -15,6 +14,8 @@ const BookPortfolioManager = () => {
     { code: 'ca', name: 'Канада', flag: '🇨🇦' },
     { code: 'de', name: 'Германия', flag: '🇩🇪' }
   ];
+
+  const englishMarkets = ['us', 'uk', 'au', 'ca'];
 
   const authors = [
     'Polly Olson',
@@ -32,72 +33,70 @@ const BookPortfolioManager = () => {
   const [formData, setFormData] = useState({
     title: '',
     author: '',
-    bookType: 'english', // 'english' или 'german'
+    bookType: 'english',
     price: '',
     amazonLink: '',
     websiteLink: '',
     portfolioName: '',
     coverImage: '',
-    status: 'active', // 'active' или 'archive'
-    account: 'Yulii' // 'Yulii' или 'Alex'
+    status: 'active',
+    account: 'Yulii'
   });
 
-  const [calculatorData, setCalculatorData] = useState({
-    price: '',
-    cost: '',
-    adSpend: '',
-    sales: ''
-  });
-
-  // Инициализация с данными из localStorage или примерами
+  // Загрузка данных из localStorage или создание примеров
   useEffect(() => {
-    // Загружаем данные из localStorage
     const savedBooks = localStorage.getItem('amazonBooks');
     
     if (savedBooks) {
-      // Если есть сохраненные данные, загружаем их
-      setBooks(JSON.parse(savedBooks));
+      try {
+        setBooks(JSON.parse(savedBooks));
+      } catch (error) {
+        console.error('Error parsing saved books:', error);
+        createSampleBooks();
+      }
     } else {
-      // Если нет сохраненных данных, добавляем примеры
-      const sampleBooks = [
-        {
-          id: 'sample1_us',
-          baseId: 'sample1',
-          title: 'The Success Mindset',
-          author: 'John Smith',
-          market: 'us',
-          price: '12.99',
-          amazonLink: 'https://amazon.com/dp/example1',
-          websiteLink: 'https://example-website.com',
-          portfolioName: 'Business Books',
-          coverImage: '',
-          status: 'active',
-          account: 'Yulii',
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: 'sample1_uk',
-          baseId: 'sample1',
-          title: 'The Success Mindset',
-          author: 'John Smith',
-          market: 'uk',
-          price: '9.99',
-          amazonLink: 'https://amazon.co.uk/dp/example1',
-          websiteLink: 'https://example-website.com',
-          portfolioName: 'Business Books',
-          coverImage: '',
-          status: 'active',
-          account: 'Alex',
-          createdAt: new Date().toISOString()
-        }
-      ];
-      setBooks(sampleBooks);
-      // Сохраняем примеры в localStorage
-      localStorage.setItem('amazonBooks', JSON.stringify(sampleBooks));
+      createSampleBooks();
     }
   }, []);
 
-  // Сохраняем в localStorage при каждом изменении книг
+  const createSampleBooks = () => {
+    const sampleBooks = [
+      {
+        id: 'sample1_us',
+        baseId: 'sample1',
+        title: 'The Success Mindset',
+        author: 'Polly Olson',
+        market: 'us',
+        price: '12.99',
+        amazonLink: 'https://amazon.com/dp/example1',
+        websiteLink: 'https://example-website.com',
+        portfolioName: 'Business Books',
+        coverImage: '',
+        status: 'active',
+        account: 'Yulii',
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'sample1_uk',
+        baseId: 'sample1',
+        title: 'The Success Mindset',
+        author: 'Polly Olson',
+        market: 'uk',
+        price: '9.99',
+        amazonLink: 'https://amazon.co.uk/dp/example1',
+        websiteLink: 'https://example-website.com',
+        portfolioName: 'Business Books',
+        coverImage: '',
+        status: 'active',
+        account: 'Alex',
+        createdAt: new Date().toISOString()
+      }
+    ];
+    setBooks(sampleBooks);
+    localStorage.setItem('amazonBooks', JSON.stringify(sampleBooks));
+  };
+
+  // Сохранение в localStorage при изменении книг
   useEffect(() => {
     if (books.length > 0) {
       localStorage.setItem('amazonBooks', JSON.stringify(books));
@@ -122,7 +121,6 @@ const BookPortfolioManager = () => {
     const newBooks = [];
 
     if (formData.bookType === 'english') {
-      // Создаем книгу для всех англоязычных рынков
       englishMarkets.forEach(market => {
         newBooks.push({
           id: `${baseId}_${market}`,
@@ -135,13 +133,12 @@ const BookPortfolioManager = () => {
           websiteLink: formData.websiteLink,
           portfolioName: formData.portfolioName,
           coverImage: formData.coverImage,
-          status: formData.status || 'active',
-          account: formData.account || 'Yulii',
+          status: formData.status,
+          account: formData.account,
           createdAt: new Date().toISOString()
         });
       });
     } else {
-      // Создаем книгу только для немецкого рынка
       newBooks.push({
         id: `${baseId}_de`,
         baseId: baseId,
@@ -153,8 +150,8 @@ const BookPortfolioManager = () => {
         websiteLink: formData.websiteLink,
         portfolioName: formData.portfolioName,
         coverImage: formData.coverImage,
-        status: formData.status || 'active',
-        account: formData.account || 'Yulii',
+        status: formData.status,
+        account: formData.account,
         createdAt: new Date().toISOString()
       });
     }
@@ -164,16 +161,11 @@ const BookPortfolioManager = () => {
   };
 
   const updateBook = () => {
-    setBooks(books.map(book => 
+    const updatedBooks = books.map(book => 
       book.id === editingBook.id ? { ...book, ...formData } : book
-    ));
-    resetForm();
-  };
-
-  const deleteBookGroup = (baseId) => {
-    const updatedBooks = books.filter(book => book.baseId !== baseId);
+    );
     setBooks(updatedBooks);
-    localStorage.setItem('amazonBooks', JSON.stringify(updatedBooks));
+    resetForm();
   };
 
   const toggleBookStatus = (bookId) => {
@@ -183,14 +175,6 @@ const BookPortfolioManager = () => {
         : book
     );
     setBooks(updatedBooks);
-    localStorage.setItem('amazonBooks', JSON.stringify(updatedBooks));
-  };
-
-  const clearAllData = () => {
-    if (window.confirm('Очистить все данные и перезагрузить с новыми примерами?')) {
-      localStorage.removeItem('amazonBooks');
-      window.location.reload();
-    }
   };
 
   const resetForm = () => {
@@ -215,7 +199,7 @@ const BookPortfolioManager = () => {
       title: book.title,
       author: book.author,
       price: book.price,
-      amazonLink: book.amazonLink,
+      amazonLink: book.amazonLink || '',
       websiteLink: book.websiteLink || '',
       portfolioName: book.portfolioName,
       coverImage: book.coverImage,
@@ -226,19 +210,14 @@ const BookPortfolioManager = () => {
     setShowAddForm(true);
   };
 
-  const filteredBooks = books.filter(book => book.market === selectedMarket);
-
-  // Получаем уникальные группы книг для текущего рынка
-  const getUniqueBookGroups = () => {
-    const seen = new Set();
-    return filteredBooks.filter(book => {
-      if (seen.has(book.baseId)) {
-        return false;
-      }
-      seen.add(book.baseId);
-      return true;
-    });
+  const clearAllData = () => {
+    if (window.confirm('Очистить все данные и перезагрузить с новыми примерами?')) {
+      localStorage.removeItem('amazonBooks');
+      window.location.reload();
+    }
   };
+
+  const filteredBooks = books.filter(book => book.market === selectedMarket);
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
@@ -476,11 +455,13 @@ const BookPortfolioManager = () => {
                 
                 {/* Аккаунт */}
                 <div className="mb-2">
-                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                    book.account === 'Yulii' 
-                      ? 'bg-blue-100 text-blue-800' 
-                      : 'bg-indigo-100 text-indigo-800'
-                  }`}>
+                  <span 
+                    className="inline-block px-2 py-1 rounded-full text-xs font-medium"
+                    style={{
+                      backgroundColor: book.account === 'Yulii' ? '#dbeafe' : '#e0e7ff',
+                      color: book.account === 'Yulii' ? '#1e40af' : '#3730a3'
+                    }}
+                  >
                     📱 {book.account || 'Yulii'}
                   </span>
                 </div>
@@ -493,11 +474,13 @@ const BookPortfolioManager = () => {
                 
                 {/* Статус книги */}
                 <div className="mb-3">
-                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                    book.status === 'active' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-gray-100 text-gray-800'
-                  }`}>
+                  <span 
+                    className="inline-block px-2 py-1 rounded-full text-xs font-medium"
+                    style={{
+                      backgroundColor: book.status === 'active' ? '#dcfce7' : '#f3f4f6',
+                      color: book.status === 'active' ? '#166534' : '#374151'
+                    }}
+                  >
                     {book.status === 'active' ? 'Активно' : 'Архив'}
                   </span>
                 </div>
@@ -559,25 +542,6 @@ const BookPortfolioManager = () => {
                       Перейти на сайт
                     </a>
                   )}
-                  
-                  {/* Если нет ссылок - показываем заглушку */}
-                  {(!book.amazonLink || book.amazonLink.trim() === '') && (!book.websiteLink || book.websiteLink.trim() === '') && (
-                    <div style={{
-                      width: '100%',
-                      backgroundColor: '#d1d5db',
-                      color: '#6b7280',
-                      fontWeight: '600',
-                      padding: '8px 16px',
-                      borderRadius: '8px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      fontSize: '14px'
-                    }}>
-                      Нет ссылок
-                    </div>
-                  )}
                 </div>
                 
                 {/* Кнопки управления */}
@@ -592,11 +556,11 @@ const BookPortfolioManager = () => {
                   </button>
                   <button
                     onClick={() => toggleBookStatus(book.id)}
-                    className={`flex-1 py-2 px-3 rounded text-xs transition-colors flex items-center justify-center gap-1 ${
-                      book.status === 'active'
-                        ? 'bg-gray-500 hover:bg-gray-600 text-white'
-                        : 'bg-green-500 hover:bg-green-600 text-white'
-                    }`}
+                    style={{
+                      backgroundColor: book.status === 'active' ? '#6b7280' : '#10b981',
+                      color: 'white'
+                    }}
+                    className="flex-1 py-2 px-3 rounded text-xs transition-colors flex items-center justify-center gap-1 hover:opacity-80"
                     title={book.status === 'active' ? 'В архив' : 'Активировать'}
                   >
                     {book.status === 'active' ? '📁 Архив' : '✅ Активно'}
