@@ -56,7 +56,7 @@ const BookPortfolioManager = () => {
           market: 'us',
           price: '12.99',
           amazonLink: 'https://amazon.com/dp/example1',
-          websiteLink: '',
+          websiteLink: 'https://example-website.com',
           portfolioName: 'Business Books',
           coverImage: '',
           status: 'active',
@@ -70,7 +70,7 @@ const BookPortfolioManager = () => {
           market: 'uk',
           price: '9.99',
           amazonLink: 'https://amazon.co.uk/dp/example1',
-          websiteLink: '',
+          websiteLink: 'https://example-website.com',
           portfolioName: 'Business Books',
           coverImage: '',
           status: 'active',
@@ -441,28 +441,39 @@ const BookPortfolioManager = () => {
                 
                 {/* Кнопки ссылок */}
                 <div className="mb-3 space-y-2">
-                  {book.amazonLink && (
+                  {/* Отладочная информация - потом удалить */}
+                  {console.log('Amazon Link:', book.amazonLink)}
+                  {console.log('Website Link:', book.websiteLink)}
+                  
+                  {book.amazonLink && book.amazonLink.trim() !== '' && (
                     <a
                       href={book.amazonLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors text-sm"
+                      className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors text-sm block"
                     >
                       <ExternalLink size={16} />
                       Посмотреть на Amazon
                     </a>
                   )}
                   
-                  {book.websiteLink && (
+                  {book.websiteLink && book.websiteLink.trim() !== '' && (
                     <a
                       href={book.websiteLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors text-sm"
+                      className="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors text-sm block"
                     >
                       <ExternalLink size={16} />
                       Перейти на сайт
                     </a>
+                  )}
+                  
+                  {/* Если нет ссылок - показываем заглушку */}
+                  {(!book.amazonLink || book.amazonLink.trim() === '') && (!book.websiteLink || book.websiteLink.trim() === '') && (
+                    <div className="w-full bg-gray-300 text-gray-600 font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 text-sm">
+                      Нет ссылок
+                    </div>
                   )}
                 </div>
                 
