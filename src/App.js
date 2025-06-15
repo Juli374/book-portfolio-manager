@@ -16,7 +16,18 @@ const BookPortfolioManager = () => {
     { code: 'de', name: 'Германия', flag: '🇩🇪' }
   ];
 
-  const englishMarkets = ['us', 'uk', 'au', 'ca'];
+  const authors = [
+    'Polly Olson',
+    'Taylor Grant', 
+    'Ariel Mullins',
+    'Dr. Rosemary Richardson',
+    'Caleb North'
+  ];
+
+  const accounts = [
+    'Yulii',
+    'Alex'
+  ];
 
   const [formData, setFormData] = useState({
     title: '',
@@ -27,7 +38,8 @@ const BookPortfolioManager = () => {
     websiteLink: '',
     portfolioName: '',
     coverImage: '',
-    status: 'active' // 'active' или 'archive'
+    status: 'active', // 'active' или 'archive'
+    account: 'Yulii' // 'Yulii' или 'Alex'
   });
 
   const [calculatorData, setCalculatorData] = useState({
@@ -60,6 +72,7 @@ const BookPortfolioManager = () => {
           portfolioName: 'Business Books',
           coverImage: '',
           status: 'active',
+          account: 'Yulii',
           createdAt: new Date().toISOString()
         },
         {
@@ -74,6 +87,7 @@ const BookPortfolioManager = () => {
           portfolioName: 'Business Books',
           coverImage: '',
           status: 'active',
+          account: 'Alex',
           createdAt: new Date().toISOString()
         }
       ];
@@ -122,6 +136,7 @@ const BookPortfolioManager = () => {
           portfolioName: formData.portfolioName,
           coverImage: formData.coverImage,
           status: formData.status || 'active',
+          account: formData.account || 'Yulii',
           createdAt: new Date().toISOString()
         });
       });
@@ -139,6 +154,7 @@ const BookPortfolioManager = () => {
         portfolioName: formData.portfolioName,
         coverImage: formData.coverImage,
         status: formData.status || 'active',
+        account: formData.account || 'Yulii',
         createdAt: new Date().toISOString()
       });
     }
@@ -180,7 +196,8 @@ const BookPortfolioManager = () => {
       websiteLink: '',
       portfolioName: '',
       coverImage: '',
-      status: 'active'
+      status: 'active',
+      account: 'Yulii'
     });
     setShowAddForm(false);
     setEditingBook(null);
@@ -195,7 +212,8 @@ const BookPortfolioManager = () => {
       websiteLink: book.websiteLink || '',
       portfolioName: book.portfolioName,
       coverImage: book.coverImage,
-      status: book.status || 'active'
+      status: book.status || 'active',
+      account: book.account || 'Yulii'
     });
     setEditingBook(book);
     setShowAddForm(true);
@@ -293,13 +311,20 @@ const BookPortfolioManager = () => {
                 onChange={(e) => setFormData({...formData, title: e.target.value})}
                 className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
               />
-              <input
-                type="text"
-                placeholder="Автор"
-                value={formData.author}
-                onChange={(e) => setFormData({...formData, author: e.target.value})}
-                className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
-              />
+              
+              <div className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                <select
+                  value={formData.author}
+                  onChange={(e) => setFormData({...formData, author: e.target.value})}
+                  className="w-full bg-transparent outline-none"
+                >
+                  <option value="">Выберите автора</option>
+                  {authors.map(author => (
+                    <option key={author} value={author}>{author}</option>
+                  ))}
+                </select>
+              </div>
+              
               <input
                 type="number"
                 placeholder="Цена ($)"
@@ -307,6 +332,7 @@ const BookPortfolioManager = () => {
                 onChange={(e) => setFormData({...formData, price: e.target.value})}
                 className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
               />
+              
               <input
                 type="text"
                 placeholder="Название портфолио"
@@ -323,6 +349,18 @@ const BookPortfolioManager = () => {
                 >
                   <option value="active">Активно</option>
                   <option value="archive">Архив</option>
+                </select>
+              </div>
+              
+              <div className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                <select
+                  value={formData.account}
+                  onChange={(e) => setFormData({...formData, account: e.target.value})}
+                  className="w-full bg-transparent outline-none"
+                >
+                  {accounts.map(account => (
+                    <option key={account} value={account}>{account}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -421,6 +459,17 @@ const BookPortfolioManager = () => {
                     {book.portfolioName}
                   </p>
                 )}
+                
+                {/* Аккаунт */}
+                <div className="mb-2">
+                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                    book.account === 'Yulii' 
+                      ? 'bg-blue-100 text-blue-800' 
+                      : 'bg-indigo-100 text-indigo-800'
+                  }`}>
+                    📱 {book.account || 'Yulii'}
+                  </span>
+                </div>
                 
                 {book.price && (
                   <div className="text-sm mb-3">
