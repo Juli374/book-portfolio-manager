@@ -186,6 +186,13 @@ const BookPortfolioManager = () => {
     localStorage.setItem('amazonBooks', JSON.stringify(updatedBooks));
   };
 
+  const clearAllData = () => {
+    if (window.confirm('Очистить все данные и перезагрузить с новыми примерами?')) {
+      localStorage.removeItem('amazonBooks');
+      window.location.reload();
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       title: '',
@@ -263,6 +270,13 @@ const BookPortfolioManager = () => {
           >
             <Plus size={20} />
             Добавить книгу
+          </button>
+          
+          <button
+            onClick={clearAllData}
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            🔄 Обновить данные
           </button>
         </div>
 
